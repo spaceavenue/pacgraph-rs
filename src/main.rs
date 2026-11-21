@@ -1,6 +1,8 @@
 pub mod compress;
 pub mod layout;
 pub mod pacman;
+pub mod render;
+pub mod theme;
 
 use layout::Layouter;
 
@@ -21,5 +23,9 @@ fn main() -> anyhow::Result<()> {
     placed.width,
     placed.height
   );
+
+  let svg = render::render_svg(&layout_graph, &placed, &theme::Theme::default())?;
+  std::fs::write("pacgraph.svg", svg)?;
+  println!("wrote pacgraph.svg");
   Ok(())
 }
