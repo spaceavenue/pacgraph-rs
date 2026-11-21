@@ -25,7 +25,7 @@ pub struct Layout {
 }
 
 /// Package size to its label font size mapping scale.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, clap::ValueEnum)]
 pub enum FontScale {
   /// Font height proportional to size. Label area grows with size².
   Linear,

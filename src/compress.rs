@@ -32,11 +32,16 @@ pub type LayoutGraph = StableDiGraph<LayoutNode, DepKind>;
 #[derive(Clone, Copy, Debug, Default)]
 pub struct CompressOptions {
   pub preserve_explicit: bool,
+
+  pub skip: bool,
 }
 
 /// Merges linear single-dependent chains into their dependents.
 pub fn compress(graph: &DiGraph<Package, DepKind>, opts: CompressOptions) -> LayoutGraph {
   let mut g = LayoutGraph::from(graph.map(|_, pkg| LayoutNode::from(pkg), |_, &kind| kind));
+  if opts.skip {
+    return g;
+  }
   let mut queue = g.node_indices().collect::<VecDeque<NodeIndex>>();
 
   while let Some(s) = queue.pop_front() {
