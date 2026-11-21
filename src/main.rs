@@ -13,12 +13,24 @@ use clap::Parser;
 use cli::Cli;
 use compress::CompressOptions;
 use layout::Layouter;
+use pacman::PacmanSource;
 
 fn main() -> anyhow::Result<()> {
   let cli = Cli::parse();
   let theme = cli.theme();
 
-  let source = pacman::PacmanSource::default();
+  if let Some(input) = &cli.recolor {
+    let svg = std::fs::read_to_string(input)
+      .with_context(|| format!("failed to read {}", input.display()))?;
+    let recolored =
+      render::recolor(&svg, &theme).context("no <style> block found in the input SVG")?;
+    let out = cli.file.clone().unwrap_or_else(|| input.clone());
+    std::fs::write(&out, recolored)?;
+    println!("recolored {} -> {}", input.display(), out.display());
+    return Ok(());
+  }
+
+  let source = PacmanSource::default();
   let graph = source.build_graph(cli.opt_deps)?;
   let layout_graph = compress::compress(
     &graph,

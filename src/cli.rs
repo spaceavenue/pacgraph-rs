@@ -24,13 +24,17 @@ pub struct Cli {
   #[arg(short = 'n', long)]
   pub no_compression: bool,
 
-  /// Output file (default: pacgraph.svg).
+  /// Output file (default: pacgraph.svg. With --recolor, the input file is rewritten).
   #[arg(short = 'f', long)]
   pub file: Option<PathBuf>,
 
   /// Print the N largest packages instead of drawing a graph.
   #[arg(long, value_name = "N")]
   pub largest: Option<usize>,
+
+  /// Recolor an existing SVG.
+  #[arg(long, value_name = "SVG_FILE")]
+  pub recolor: Option<PathBuf>,
 
   // layout
   /// Smallest and largest font size in points.

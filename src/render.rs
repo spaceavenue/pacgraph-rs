@@ -72,6 +72,19 @@ fn control_point(from: (f64, f64), to: (f64, f64), core: (f64, f64)) -> (f64, f6
   (core.0 + vx * cos - vy * sin, core.1 + vx * sin + vy * cos)
 }
 
+/// Recolor the `svg` using `theme`.
+pub fn recolor(svg: &str, theme: &Theme) -> Option<String> {
+  let start = svg.find("<style>")?;
+  let end = start + svg[start..].find("</style>")? + "</style>".len();
+  Some(format!(
+    "{}{}{}",
+    &svg[..start],
+    stylesheet(theme),
+    &svg[end..]
+  ))
+}
+
+/// Renders the svg.
 pub fn render_svg(graph: &LayoutGraph, layout: &Layout, theme: &Theme) -> anyhow::Result<String> {
   let mut out = String::new();
   let (w, h) = (layout.width, layout.height);
