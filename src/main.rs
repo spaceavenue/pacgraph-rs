@@ -3,6 +3,7 @@ pub mod compress;
 pub mod layout;
 pub mod pacman;
 pub mod render;
+pub mod report;
 pub mod theme;
 
 use std::path::PathBuf;
@@ -26,6 +27,11 @@ fn main() -> anyhow::Result<()> {
       skip: cli.no_compression,
     },
   );
+
+  if let Some(n) = cli.largest {
+    report::print_largest(&layout_graph, n);
+    return Ok(());
+  }
 
   println!(
     "{} packages -> {} nodes",

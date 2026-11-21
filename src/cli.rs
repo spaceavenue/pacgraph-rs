@@ -28,6 +28,10 @@ pub struct Cli {
   #[arg(short = 'f', long)]
   pub file: Option<PathBuf>,
 
+  /// Print the N largest packages instead of drawing a graph.
+  #[arg(long, value_name = "N")]
+  pub largest: Option<usize>,
+
   // layout
   /// Smallest and largest font size in points.
   #[arg(long, num_args = 2, value_names = ["MIN", "MAX"])]
