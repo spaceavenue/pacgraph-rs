@@ -4,6 +4,7 @@ use petgraph::Direction::{Incoming, Outgoing};
 use petgraph::visit::{EdgeRef, IntoEdgeReferences};
 
 use crate::compress::LayoutGraph;
+use crate::highlight::Highlight;
 use crate::layout::Layout;
 use crate::pacman::DepKind;
 use crate::theme::Theme;
@@ -85,7 +86,12 @@ pub fn recolor(svg: &str, theme: &Theme) -> Option<String> {
 }
 
 /// Renders the svg.
-pub fn render_svg(graph: &LayoutGraph, layout: &Layout, theme: &Theme) -> anyhow::Result<String> {
+pub fn render_svg(
+  graph: &LayoutGraph,
+  layout: &Layout,
+  theme: &Theme,
+  highlight: &Highlight,
+) -> anyhow::Result<String> {
   let mut out = String::new();
   let (w, h) = (layout.width, layout.height);
 
@@ -128,7 +134,7 @@ pub fn render_svg(graph: &LayoutGraph, layout: &Layout, theme: &Theme) -> anyhow
       continue;
     };
     let is_top = graph.edges_directed(idx, Incoming).next().is_none();
-    let class = if is_top { "node top" } else { "node dep" };
+    let class = highlight.role_of(idx, is_top).class();
 
     let mut deps: Vec<&str> = graph
       .edges_directed(idx, Outgoing)

@@ -14,6 +14,7 @@ pub struct LayoutNode {
   pub size: u64,
   pub explicit: bool,
   pub merged_count: usize,
+  pub members: Vec<String>,
 }
 
 impl From<&Package> for LayoutNode {
@@ -23,6 +24,7 @@ impl From<&Package> for LayoutNode {
       size: pkg.size,
       explicit: pkg.reason == InstallReason::Explicit,
       merged_count: 1,
+      members: vec![pkg.name.clone()],
     }
   }
 }
@@ -58,8 +60,10 @@ pub fn compress(graph: &DiGraph<Package, DepKind>, opts: CompressOptions) -> Lay
       .collect::<Vec<(NodeIndex, DepKind)>>();
 
     let (size, count) = (g[s].size, g[s].merged_count);
+    let members = std::mem::take(&mut g[s].members);
     g[parent].size += size;
     g[parent].merged_count += count;
+    g[parent].members.extend(members);
 
     // put s's dependencies onto the parent, keeping Required over Optional
     for &(dep, kind) in &deps {

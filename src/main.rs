@@ -1,5 +1,6 @@
 pub mod cli;
 pub mod compress;
+pub mod highlight;
 pub mod layout;
 pub mod pacman;
 pub mod render;
@@ -12,6 +13,7 @@ use anyhow::Context;
 use clap::Parser;
 use cli::Cli;
 use compress::CompressOptions;
+use highlight::Highlight;
 use layout::Layouter;
 use pacman::PacmanSource;
 
@@ -45,6 +47,11 @@ fn main() -> anyhow::Result<()> {
     return Ok(());
   }
 
+  let (highlight, unknown) = Highlight::new(&layout_graph, &cli.packages);
+  for name in &unknown {
+    eprintln!("warning: package '{name}' is not installed, ignoring");
+  }
+
   println!(
     "{} packages -> {} nodes",
     graph.node_count(),
@@ -65,7 +72,7 @@ fn main() -> anyhow::Result<()> {
   {
     out.set_extension("svg");
   }
-  let svg = render::render_svg(&layout_graph, &placed, &theme)?;
+  let svg = render::render_svg(&layout_graph, &placed, &theme, &highlight)?;
   std::fs::write(&out, svg).with_context(|| format!("failed to write {}", out.display()))?;
   println!(
     "wrote {} ({:.0}x{:.0}px)",
